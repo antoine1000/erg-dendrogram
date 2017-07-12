@@ -1,12 +1,12 @@
 var margin = {top: 20, right: 120, bottom: 20, left: 120},
-    width = 960 - margin.right - margin.left,
-    height = 800 - margin.top - margin.bottom;
+    width = 1000 - margin.right - margin.left,
+    height = 700 - margin.top - margin.bottom;
 
 var i = 0,
     duration = 750,
     root;
 
-var tree = d3.layout.tree()
+var tree = d3.layout.cluster()
     .size([height, width]);
 
 var diagonal = d3.svg.diagonal()
@@ -18,7 +18,10 @@ var svg = d3.select("body").append("svg")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-d3.json("flare.json", function(error, flare) {
+// Import lightbox
+var lightbox;
+
+d3.json("erg.json", function(error, flare) {
   if (error) throw error;
 
   root = flare;
@@ -60,7 +63,12 @@ function update(source) {
 
   nodeEnter.append("circle")
       .attr("r", 1e-6)
-      .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+      .style("fill", function(d) { return d._children ? "lightgrey" : "#fff"; })
+      //open lightbox when a node has link and is clicked
+      .on("click", function (d) {
+            d3.event.preventDefault();
+            lightbox = lity(d.link);
+        })
 
   nodeEnter.append("text")
       .attr("x", function(d) { return d.children || d._children ? -10 : 10; })
@@ -76,7 +84,7 @@ function update(source) {
 
   nodeUpdate.select("circle")
       .attr("r", 4.5)
-      .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+      .style("fill", function(d) { return d._children ? "lightgrey" : "#fff"; });
 
   nodeUpdate.select("text")
       .style("fill-opacity", 1);
