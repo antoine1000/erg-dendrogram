@@ -3,10 +3,15 @@
 }
 
 .node circle {
-  fill: grey;
+  fill: white;
   stroke: lightgrey;
   stroke-width: 1.5px;
 }
+
+.node circle:hover {
+	stroke: red;
+}
+
 
 .node text {
   font: 12px 'Helvetica', sans-serif;
@@ -16,4 +21,8 @@
   fill: none;
   stroke: grey;
   stroke-width: 1.5px;
+}
+
+.node circle.active {
+	fill: blue;
 }

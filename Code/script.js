@@ -1,6 +1,6 @@
-var margin = {top: 20, right: 120, bottom: 20, left: 120},
-    width = 1000 - margin.right - margin.left,
-    height = 700 - margin.top - margin.bottom;
+var margin = {top: 20, right: 120, bottom: 20, left: 120};
+var width = 1000;
+var height = 700;
 
 var i = 0,
     duration = 750,
@@ -63,11 +63,27 @@ function update(source) {
 
   nodeEnter.append("circle")
       .attr("r", 1e-6)
-      .style("fill", function(d) { return d._children ? "lightgrey" : "#fff"; })
+      /*.classed("leaf", function(d) { return !d._children; })*/
       //open lightbox when a node has link and is clicked
       .on("click", function (d) {
+        console.log('click! / this =', this, '/ d =', d);
+        //open lightbox
+        if(d.link){
             d3.event.preventDefault();
             lightbox = lity(d.link);
+          }
+        // d3
+          d3.selectAll("circle.active").classed("active", false);
+          d3.select(this).classed("active", true);
+          var clickedCircle = this;
+          console.log('need to activate', d.parent);
+          /*d3.selectAll("circle").filter(function (cd) {return cd == d.parent }).classed('active', true);*/
+          d3.selectAll("circle").each(function (cd) {
+            if(cd == d.parent){
+              d3.select(this).classed('active', true);
+            }
+          });
+        // select the parent circle of this element
         })
 
   nodeEnter.append("text")
@@ -78,13 +94,14 @@ function update(source) {
       .style("fill-opacity", 1e-6);
 
   // Transition nodes to their new position.
+  node.classed("leaf", function(d) { return !d._children; });
   var nodeUpdate = node.transition()
       .duration(duration)
       .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
 
   nodeUpdate.select("circle")
-      .attr("r", 4.5)
-      .style("fill", function(d) { return d._children ? "lightgrey" : "#fff"; });
+      .attr("r", 4.5);
+      
 
   nodeUpdate.select("text")
       .style("fill-opacity", 1);
