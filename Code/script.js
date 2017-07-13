@@ -61,6 +61,29 @@ function update(source) {
       .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
       .on("click", click);
 
+
+function activate(elt, d, noclear) {
+  // Clear all active classes
+  if(noclear == undefined) {
+    d3.selectAll("circle.active").classed("active", false);
+  }
+  // Add active class to elements
+    d3.select(elt).classed("active", true);
+    console.log('need to activate', d.parent);
+    /*d3.selectAll("circle").filter(function (cd) {return cd == d.parent }).classed('active', true);*/
+    d3.selectAll("circle").each(function (cd) {
+      if(cd == d.parent){
+        activate(this, cd, true);
+        d3.select(this).classed('active', true);
+      }
+    d3.selectAll("path.link").each(function (cd){
+      if(cd.target == d){
+        d3.select(this).classed('active', true);
+      }
+    })
+  });
+}
+
   nodeEnter.append("circle")
       .attr("r", 1e-6)
       /*.classed("leaf", function(d) { return !d._children; })*/
@@ -73,17 +96,16 @@ function update(source) {
             lightbox = lity(d.link);
           }
         // d3
-          d3.selectAll("circle.active").classed("active", false);
+         /* d3.selectAll("circle.active").classed("active", false);
           d3.select(this).classed("active", true);
           var clickedCircle = this;
           console.log('need to activate', d.parent);
-          /*d3.selectAll("circle").filter(function (cd) {return cd == d.parent }).classed('active', true);*/
           d3.selectAll("circle").each(function (cd) {
             if(cd == d.parent){
               d3.select(this).classed('active', true);
             }
-          });
-        // select the parent circle of this element
+          });*/
+          activate(this, d);
         })
 
   nodeEnter.append("text")
