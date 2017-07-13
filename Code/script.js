@@ -6,8 +6,9 @@ var i = 0,
     duration = 750,
     root;
 
-var tree = d3.layout.cluster()
+var tree = d3.layout.tree()
     .size([height, width]);
+    /*.size([360, width / 2 - 120]);*/
 
 var diagonal = d3.svg.diagonal()
     .projection(function(d) { return [d.y, d.x]; });
@@ -21,10 +22,11 @@ var svg = d3.select("body").append("svg")
 // Import lightbox
 var lightbox;
 
-d3.json("erg.json", function(error, flare) {
+// "erg.json" is the data we use for the dendrogram - Edit the document as you want
+d3.json("erg.json", function(error, erg) {
   if (error) throw error;
 
-  root = flare;
+  root = erg;
   root.x0 = height / 2;
   root.y0 = 0;
 
@@ -55,57 +57,27 @@ function update(source) {
   var node = svg.selectAll("g.node")
       .data(nodes, function(d) { return d.id || (d.id = ++i); });
 
+
   // Enter any new nodes at the parent's previous position.
   var nodeEnter = node.enter().append("g")
       .attr("class", "node")
       .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
+      /*.attr("transform", function(d) { return "translate(" + project(d.x, d.y) + ")"; })*/
       .on("click", click);
 
 
-function activate(elt, d, noclear) {
-  // Clear all active classes
-  if(noclear == undefined) {
-    d3.selectAll("circle.active").classed("active", false);
-  }
-  // Add active class to elements
-    d3.select(elt).classed("active", true);
-    console.log('need to activate', d.parent);
-    /*d3.selectAll("circle").filter(function (cd) {return cd == d.parent }).classed('active', true);*/
-    d3.selectAll("circle").each(function (cd) {
-      if(cd == d.parent){
-        activate(this, cd, true);
-        d3.select(this).classed('active', true);
-      }
-    d3.selectAll("path.link").each(function (cd){
-      if(cd.target == d){
-        d3.select(this).classed('active', true);
-      }
-    })
-  });
-}
-
   nodeEnter.append("circle")
       .attr("r", 1e-6)
-      /*.classed("leaf", function(d) { return !d._children; })*/
-      //open lightbox when a node has link and is clicked
+      // Open lightbox when a node has link and is clicked
       .on("click", function (d) {
         console.log('click! / this =', this, '/ d =', d);
-        //open lightbox
+      
         if(d.link){
             d3.event.preventDefault();
             lightbox = lity(d.link);
           }
-        // d3
-         /* d3.selectAll("circle.active").classed("active", false);
-          d3.select(this).classed("active", true);
-          var clickedCircle = this;
-          console.log('need to activate', d.parent);
-          d3.selectAll("circle").each(function (cd) {
-            if(cd == d.parent){
-              d3.select(this).classed('active', true);
-            }
-          });*/
-          activate(this, d);
+      // If a circle is clicked on, color it and the path
+            activate(this, d);
         })
 
   nodeEnter.append("text")
@@ -124,7 +96,6 @@ function activate(elt, d, noclear) {
   nodeUpdate.select("circle")
       .attr("r", 4.5);
       
-
   nodeUpdate.select("text")
       .style("fill-opacity", 1);
 
@@ -183,4 +154,35 @@ function click(d) {
     d._children = null;
   }
   update(d);
+}
+
+
+function project(x, y) {
+  var angle = (x - 90) / 180 * Math.PI, radius = y;
+  return [radius * Math.cos(angle), radius * Math.sin(angle)];
+}
+
+// Add an activate class circles and paths with color
+function activate(elt, d, noclear) {
+  // Clear all active classes
+  if(noclear == undefined) {
+    d3.selectAll("circle.active").classed("active", false);
+    d3.selectAll("path.link").classed("active", false);
+  }
+  // Add active class to elements
+    d3.select(elt).classed("active", true);
+    console.log('need to activate', d.parent);
+    
+    d3.selectAll("circle").each(function (cd) {
+      if(cd == d.parent){
+        activate(this, cd, true);
+        d3.select(this).classed('active', true);
+      }
+    // Give "active" class to path between clicked node
+    d3.selectAll("path.link").each(function (cd){
+      if(cd.target == d){
+        d3.select(this).classed('active', true);
+      }
+    })
+  });
 }

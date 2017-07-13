@@ -9,24 +9,39 @@
 }
 
 .node circle:hover {
-	stroke: red;
+	stroke: blue;
 }
-
 
 .node text {
   font: 12px 'Helvetica', sans-serif;
+  margin-left: 20px;
 }
 
 .link {
   fill: none;
-  stroke: grey;
-  stroke-width: 1.5px;
+  stroke: lightgrey;
+  stroke-width: 1px;
 }
 
 .node circle.active {
-	fill: red;
+	fill: blue;
+	stroke: none;
+}
+ 
+@keyframes dash {
+  to {
+    stroke-dashoffset: 0%;
+  }
 }
 
+path {
+  stroke-dasharray: 100%;
+  stroke-dashoffset: 100%;
+  animation: dash 5s ease-in-out forwards;
+}
+
+
 path.link.active {
-	stroke: red;
+	stroke: blue;
+	stroke-width: 2.5px;
 }
