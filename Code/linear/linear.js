@@ -23,7 +23,7 @@ var svg = d3.select("body").append("svg")
 var lightbox;
 
 // "erg.json" is the data we use for the dendrogram - Edit the document as you want
-d3.json("erg.json", function(error, erg) {
+d3.json("./erg.json", function(error, erg) {
   if (error) throw error;
 
   root = erg;
