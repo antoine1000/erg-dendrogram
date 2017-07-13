@@ -1,4 +1,5 @@
 var diameter = 800;
+var lightbox;
 
 var margin = {top: 20, right: 120, bottom: 20, left: 120},
     width = diameter,
@@ -71,6 +72,15 @@ function update(source) {
 
   nodeEnter.append("circle")
       .attr("r", 1e-6)
+      .on("click", function (d) {
+        /*console.log('click! / this =', this, '/ d =', d);*/
+        if(d.link){
+            d3.event.preventDefault();
+            lightbox = lity(d.link);
+          }
+      // If a circle is clicked on, color it and the path
+            activate(this, d);
+        })
       /*.style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });*/
 
   nodeEnter.append("text")
@@ -159,4 +169,29 @@ function collapse(d) {
       d._children.forEach(collapse);
       d.children = null;
     }
+}
+
+// Add an activate class circles and paths with color
+function activate(elt, d, noclear) {
+  // Clear all active classes
+  if(noclear == undefined) {
+    d3.selectAll("circle.active").classed("active", false);
+    d3.selectAll("path.link").classed("active", false);
+  }
+  // Add active class to elements
+    d3.select(elt).classed("active", true);
+    console.log('need to activate', d.parent);
+    
+    d3.selectAll("circle").each(function (cd) {
+      if(cd == d.parent){
+        activate(this, cd, true);
+        d3.select(this).classed('active', true);
+      }
+    // Give "active" class to path between clicked node
+    d3.selectAll("path.link").each(function (cd){
+      if(cd.target == d){
+        d3.select(this).classed('active', true);
+      }
+    })
+  });
 }

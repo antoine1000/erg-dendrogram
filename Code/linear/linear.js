@@ -22,8 +22,8 @@ var svg = d3.select("body").append("svg")
 // Import lightbox
 var lightbox;
 
-// "erg.json" is the data we use for the dendrogram - Edit the document as you want
-d3.json("./erg.json", function(error, erg) {
+// Uncomment if you prefer to use the erg.json file
+/*d3.json("./erg.json", function(error, erg) {
   if (error) throw error;
 
   root = erg;
@@ -40,7 +40,14 @@ d3.json("./erg.json", function(error, erg) {
 
   root.children.forEach(collapse);
   update(root);
-});
+});*/
+
+root = erg;
+root.x0 = height / 2;
+root.y0 = 0;
+
+root.children.forEach(collapse); // start with all children collapsed
+update(root);
 
 d3.select(self.frameElement).style("height", "800px");
 
@@ -144,6 +151,19 @@ function update(source) {
   });
 }
 
+
+/* ----- Functions ----- */
+
+
+// Collapse nodes
+function collapse(d) {
+  if (d.children) {
+      d._children = d.children;
+      d._children.forEach(collapse);
+      d.children = null;
+    }
+}
+
 // Toggle children on click.
 function click(d) {
   if (d.children) {
@@ -161,6 +181,8 @@ function project(x, y) {
   var angle = (x - 90) / 180 * Math.PI, radius = y;
   return [radius * Math.cos(angle), radius * Math.sin(angle)];
 }
+
+
 
 // Add an activate class circles and paths with color
 function activate(elt, d, noclear) {
